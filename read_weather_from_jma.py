@@ -9,16 +9,14 @@ def parse_date(get_data):
     return show_date
 
 
-def parse_three_date(get_data, name):
-    return_data = {name: get_data}
-    index = 0
-    for data in return_data[name]:
-        try:
-            return_data[name][index] = parse_date(data)
-        except ValueError:
-            return_data[name][index] = ' '.join(data.split())
-        index += 1
-    return return_data
+def parse_three_date(dates, weathers):
+    weather_context = []
+    for date, weather in zip(dates, weathers):
+        date = parse_date(date)
+        weather = "".join(weather.split())
+        weather_dict = {'date': date, 'weather': weather}
+        weather_context.append(weather_dict)
+    return weather_context
 
 
 def main():
@@ -31,12 +29,12 @@ def main():
     publishing_office = data[0]['publishingOffice']    # 仙台管区気象台
     report_datetime = parse_date(data[0]['reportDatetime'])    # 発表日時
     area = data[0]['timeSeries'][0]['areas'][0]['area']['name']    # 場所。今回は仙台市東部のみ
-    three_dates = parse_three_date(data[0]['timeSeries'][0]['timeDefines'], 'three_dates')    # 3日間の日付
-    three_weathers = parse_three_date(data[0]['timeSeries'][0]['areas'][0]['weathers'], 'three_weathers')    # ３日間の天気
+    three_dates = data[0]['timeSeries'][0]['timeDefines']    # 3日間の日付
+    three_weathers = data[0]['timeSeries'][0]['areas'][0]['weathers']    # ３日間の天気
+    weathers = parse_three_date(three_dates, three_weathers)    # リスト化
 
     print(publishing_office, report_datetime, area)
-    pprint.pprint(three_dates)
-    pprint.pprint(three_weathers)
+    pprint.pprint(weathers)
 
 
 if __name__ == '__main__':
